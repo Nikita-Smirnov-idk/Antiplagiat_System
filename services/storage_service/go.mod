@@ -1,4 +1,4 @@
-module storage_service
+module github.com/Nikita-Smirnov-idk/storage-service
 
 go 1.25
 
