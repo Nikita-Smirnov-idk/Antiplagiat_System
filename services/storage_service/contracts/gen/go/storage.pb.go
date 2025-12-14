@@ -21,31 +21,29 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Meta data of file
-type FileMetadata struct {
+// Request for url to upload file
+type GenerateUploadURLRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`                    // Name of file
-	StudentId     string                 `protobuf:"bytes,2,opt,name=student_id,json=studentId,proto3" json:"student_id,omitempty"` // ID of student
-	TaskId        string                 `protobuf:"bytes,3,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`          // ID of task
-	Size          int64                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`                           // File size in bytes
+	StudentId     string                 `protobuf:"bytes,1,opt,name=StudentId,proto3" json:"StudentId,omitempty"`
+	TaskId        string                 `protobuf:"bytes,2,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FileMetadata) Reset() {
-	*x = FileMetadata{}
+func (x *GenerateUploadURLRequest) Reset() {
+	*x = GenerateUploadURLRequest{}
 	mi := &file_storage_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FileMetadata) String() string {
+func (x *GenerateUploadURLRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FileMetadata) ProtoMessage() {}
+func (*GenerateUploadURLRequest) ProtoMessage() {}
 
-func (x *FileMetadata) ProtoReflect() protoreflect.Message {
+func (x *GenerateUploadURLRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -57,61 +55,47 @@ func (x *FileMetadata) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FileMetadata.ProtoReflect.Descriptor instead.
-func (*FileMetadata) Descriptor() ([]byte, []int) {
+// Deprecated: Use GenerateUploadURLRequest.ProtoReflect.Descriptor instead.
+func (*GenerateUploadURLRequest) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FileMetadata) GetFilename() string {
-	if x != nil {
-		return x.Filename
-	}
-	return ""
-}
-
-func (x *FileMetadata) GetStudentId() string {
+func (x *GenerateUploadURLRequest) GetStudentId() string {
 	if x != nil {
 		return x.StudentId
 	}
 	return ""
 }
 
-func (x *FileMetadata) GetTaskId() string {
+func (x *GenerateUploadURLRequest) GetTaskId() string {
 	if x != nil {
 		return x.TaskId
 	}
 	return ""
 }
 
-func (x *FileMetadata) GetSize() int64 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-// Chunk of file
-type FileChunk struct {
+// Response after generating upload link
+type GenerateUploadURLResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"` // chunk
+	Url           string                 `protobuf:"bytes,1,opt,name=Url,proto3" json:"Url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *FileChunk) Reset() {
-	*x = FileChunk{}
+func (x *GenerateUploadURLResponse) Reset() {
+	*x = GenerateUploadURLResponse{}
 	mi := &file_storage_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *FileChunk) String() string {
+func (x *GenerateUploadURLResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*FileChunk) ProtoMessage() {}
+func (*GenerateUploadURLResponse) ProtoMessage() {}
 
-func (x *FileChunk) ProtoReflect() protoreflect.Message {
+func (x *GenerateUploadURLResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -123,42 +107,41 @@ func (x *FileChunk) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use FileChunk.ProtoReflect.Descriptor instead.
-func (*FileChunk) Descriptor() ([]byte, []int) {
+// Deprecated: Use GenerateUploadURLResponse.ProtoReflect.Descriptor instead.
+func (*GenerateUploadURLResponse) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *FileChunk) GetData() []byte {
+func (x *GenerateUploadURLResponse) GetUrl() string {
 	if x != nil {
-		return x.Data
+		return x.Url
 	}
-	return nil
+	return ""
 }
 
-// Response after file was uploaded
-type UploadResponse struct {
+// Request for verifying uploaded file
+type VerifyUploadedFileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"` // Unique file ID
-	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`            // Transfer status (success/error)
-	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`                 // Error info in case of error
+	StudentId     string                 `protobuf:"bytes,1,opt,name=StudentId,proto3" json:"StudentId,omitempty"`
+	TaskId        string                 `protobuf:"bytes,2,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadResponse) Reset() {
-	*x = UploadResponse{}
+func (x *VerifyUploadedFileRequest) Reset() {
+	*x = VerifyUploadedFileRequest{}
 	mi := &file_storage_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadResponse) String() string {
+func (x *VerifyUploadedFileRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadResponse) ProtoMessage() {}
+func (*VerifyUploadedFileRequest) ProtoMessage() {}
 
-func (x *UploadResponse) ProtoReflect() protoreflect.Message {
+func (x *VerifyUploadedFileRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -170,58 +153,47 @@ func (x *UploadResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadResponse.ProtoReflect.Descriptor instead.
-func (*UploadResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use VerifyUploadedFileRequest.ProtoReflect.Descriptor instead.
+func (*VerifyUploadedFileRequest) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UploadResponse) GetFileId() string {
+func (x *VerifyUploadedFileRequest) GetStudentId() string {
 	if x != nil {
-		return x.FileId
+		return x.StudentId
 	}
 	return ""
 }
 
-func (x *UploadResponse) GetSuccess() bool {
+func (x *VerifyUploadedFileRequest) GetTaskId() string {
 	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *UploadResponse) GetError() string {
-	if x != nil {
-		return x.Error
+		return x.TaskId
 	}
 	return ""
 }
 
-// Request for client-streaming
-type UploadRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Content:
-	//
-	//	*UploadRequest_Metadata
-	//	*UploadRequest_Chunk
-	Content       isUploadRequest_Content `protobuf_oneof:"content"`
+// Response after verifying uploaded file
+type VerifyUploadedFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileId        string                 `protobuf:"bytes,1,opt,name=FileId,proto3" json:"FileId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UploadRequest) Reset() {
-	*x = UploadRequest{}
+func (x *VerifyUploadedFileResponse) Reset() {
+	*x = VerifyUploadedFileResponse{}
 	mi := &file_storage_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UploadRequest) String() string {
+func (x *VerifyUploadedFileResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UploadRequest) ProtoMessage() {}
+func (*VerifyUploadedFileResponse) ProtoMessage() {}
 
-func (x *UploadRequest) ProtoReflect() protoreflect.Message {
+func (x *VerifyUploadedFileResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -233,119 +205,93 @@ func (x *UploadRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UploadRequest.ProtoReflect.Descriptor instead.
-func (*UploadRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use VerifyUploadedFileResponse.ProtoReflect.Descriptor instead.
+func (*VerifyUploadedFileResponse) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *UploadRequest) GetContent() isUploadRequest_Content {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-func (x *UploadRequest) GetMetadata() *FileMetadata {
-	if x != nil {
-		if x, ok := x.Content.(*UploadRequest_Metadata); ok {
-			return x.Metadata
-		}
-	}
-	return nil
-}
-
-func (x *UploadRequest) GetChunk() *FileChunk {
-	if x != nil {
-		if x, ok := x.Content.(*UploadRequest_Chunk); ok {
-			return x.Chunk
-		}
-	}
-	return nil
-}
-
-type isUploadRequest_Content interface {
-	isUploadRequest_Content()
-}
-
-type UploadRequest_Metadata struct {
-	Metadata *FileMetadata `protobuf:"bytes,1,opt,name=metadata,proto3,oneof"` // Meta data
-}
-
-type UploadRequest_Chunk struct {
-	Chunk *FileChunk `protobuf:"bytes,2,opt,name=chunk,proto3,oneof"` // Chunk
-}
-
-func (*UploadRequest_Metadata) isUploadRequest_Content() {}
-
-func (*UploadRequest_Chunk) isUploadRequest_Content() {}
-
-// Request for downloading
-type DownloadRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DownloadRequest) Reset() {
-	*x = DownloadRequest{}
-	mi := &file_storage_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DownloadRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DownloadRequest) ProtoMessage() {}
-
-func (x *DownloadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_storage_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DownloadRequest.ProtoReflect.Descriptor instead.
-func (*DownloadRequest) Descriptor() ([]byte, []int) {
-	return file_storage_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *DownloadRequest) GetFileId() string {
+func (x *VerifyUploadedFileResponse) GetFileId() string {
 	if x != nil {
 		return x.FileId
 	}
 	return ""
 }
 
-// Response after download
-type DownloadResponse struct {
+// Request for url to download file
+type GenerateDownloadURLRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	StudentId     string                 `protobuf:"bytes,1,opt,name=StudentId,proto3" json:"StudentId,omitempty"`
+	TaskId        string                 `protobuf:"bytes,2,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DownloadResponse) Reset() {
-	*x = DownloadResponse{}
+func (x *GenerateDownloadURLRequest) Reset() {
+	*x = GenerateDownloadURLRequest{}
+	mi := &file_storage_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateDownloadURLRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateDownloadURLRequest) ProtoMessage() {}
+
+func (x *GenerateDownloadURLRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_storage_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateDownloadURLRequest.ProtoReflect.Descriptor instead.
+func (*GenerateDownloadURLRequest) Descriptor() ([]byte, []int) {
+	return file_storage_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GenerateDownloadURLRequest) GetStudentId() string {
+	if x != nil {
+		return x.StudentId
+	}
+	return ""
+}
+
+func (x *GenerateDownloadURLRequest) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
+// Response after generating download link
+type GenerateDownloadURLResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=Url,proto3" json:"Url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateDownloadURLResponse) Reset() {
+	*x = GenerateDownloadURLResponse{}
 	mi := &file_storage_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DownloadResponse) String() string {
+func (x *GenerateDownloadURLResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DownloadResponse) ProtoMessage() {}
+func (*GenerateDownloadURLResponse) ProtoMessage() {}
 
-func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
+func (x *GenerateDownloadURLResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -357,14 +303,102 @@ func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DownloadResponse.ProtoReflect.Descriptor instead.
-func (*DownloadResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GenerateDownloadURLResponse.ProtoReflect.Descriptor instead.
+func (*GenerateDownloadURLResponse) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *DownloadResponse) GetData() []byte {
+func (x *GenerateDownloadURLResponse) GetUrl() string {
 	if x != nil {
-		return x.Data
+		return x.Url
+	}
+	return ""
+}
+
+type GetStudentsByTaskIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetStudentsByTaskIdRequest) Reset() {
+	*x = GetStudentsByTaskIdRequest{}
+	mi := &file_storage_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStudentsByTaskIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStudentsByTaskIdRequest) ProtoMessage() {}
+
+func (x *GetStudentsByTaskIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_storage_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStudentsByTaskIdRequest.ProtoReflect.Descriptor instead.
+func (*GetStudentsByTaskIdRequest) Descriptor() ([]byte, []int) {
+	return file_storage_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetStudentsByTaskIdRequest) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
+type GetStudentsByTaskIdResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StudentIds    []string               `protobuf:"bytes,1,rep,name=student_ids,json=studentIds,proto3" json:"student_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetStudentsByTaskIdResponse) Reset() {
+	*x = GetStudentsByTaskIdResponse{}
+	mi := &file_storage_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetStudentsByTaskIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetStudentsByTaskIdResponse) ProtoMessage() {}
+
+func (x *GetStudentsByTaskIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_storage_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetStudentsByTaskIdResponse.ProtoReflect.Descriptor instead.
+func (*GetStudentsByTaskIdResponse) Descriptor() ([]byte, []int) {
+	return file_storage_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetStudentsByTaskIdResponse) GetStudentIds() []string {
+	if x != nil {
+		return x.StudentIds
 	}
 	return nil
 }
@@ -373,31 +407,32 @@ var File_storage_proto protoreflect.FileDescriptor
 
 const file_storage_proto_rawDesc = "" +
 	"\n" +
-	"\rstorage.proto\x12\astorage\"v\n" +
-	"\fFileMetadata\x12\x1a\n" +
-	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x1d\n" +
-	"\n" +
-	"student_id\x18\x02 \x01(\tR\tstudentId\x12\x17\n" +
-	"\atask_id\x18\x03 \x01(\tR\x06taskId\x12\x12\n" +
-	"\x04size\x18\x04 \x01(\x03R\x04size\"\x1f\n" +
-	"\tFileChunk\x12\x12\n" +
-	"\x04data\x18\x01 \x01(\fR\x04data\"Y\n" +
-	"\x0eUploadResponse\x12\x17\n" +
-	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x14\n" +
-	"\x05error\x18\x03 \x01(\tR\x05error\"{\n" +
-	"\rUploadRequest\x123\n" +
-	"\bmetadata\x18\x01 \x01(\v2\x15.storage.FileMetadataH\x00R\bmetadata\x12*\n" +
-	"\x05chunk\x18\x02 \x01(\v2\x12.storage.FileChunkH\x00R\x05chunkB\t\n" +
-	"\acontent\"*\n" +
-	"\x0fDownloadRequest\x12\x17\n" +
-	"\afile_id\x18\x01 \x01(\tR\x06fileId\"&\n" +
-	"\x10DownloadResponse\x12\x12\n" +
-	"\x04data\x18\x01 \x01(\fR\x04data2\xa0\x01\n" +
-	"\x12FileStoringService\x12A\n" +
-	"\n" +
-	"UploadFile\x12\x16.storage.UploadRequest\x1a\x17.storage.UploadResponse\"\x00(\x01\x12G\n" +
-	"\fDownloadFile\x12\x18.storage.DownloadRequest\x1a\x19.storage.DownloadResponse\"\x000\x01B\\ZZgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/gen/go;storagepbb\x06proto3"
+	"\rstorage.proto\x12\astorage\"P\n" +
+	"\x18GenerateUploadURLRequest\x12\x1c\n" +
+	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x12\x16\n" +
+	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\"-\n" +
+	"\x19GenerateUploadURLResponse\x12\x10\n" +
+	"\x03Url\x18\x01 \x01(\tR\x03Url\"Q\n" +
+	"\x19VerifyUploadedFileRequest\x12\x1c\n" +
+	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x12\x16\n" +
+	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\"4\n" +
+	"\x1aVerifyUploadedFileResponse\x12\x16\n" +
+	"\x06FileId\x18\x01 \x01(\tR\x06FileId\"R\n" +
+	"\x1aGenerateDownloadURLRequest\x12\x1c\n" +
+	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x12\x16\n" +
+	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\"/\n" +
+	"\x1bGenerateDownloadURLResponse\x12\x10\n" +
+	"\x03Url\x18\x01 \x01(\tR\x03Url\"4\n" +
+	"\x1aGetStudentsByTaskIdRequest\x12\x16\n" +
+	"\x06TaskId\x18\x01 \x01(\tR\x06TaskId\">\n" +
+	"\x1bGetStudentsByTaskIdResponse\x12\x1f\n" +
+	"\vstudent_ids\x18\x01 \x03(\tR\n" +
+	"studentIds2\x90\x03\n" +
+	"\aStorage\x12\\\n" +
+	"\x11GenerateUploadURL\x12!.storage.GenerateUploadURLRequest\x1a\".storage.GenerateUploadURLResponse\"\x00\x12_\n" +
+	"\x12VerifyUploadedFile\x12\".storage.VerifyUploadedFileRequest\x1a#.storage.VerifyUploadedFileResponse\"\x00\x12b\n" +
+	"\x13GenerateDownloadURL\x12#.storage.GenerateDownloadURLRequest\x1a$.storage.GenerateDownloadURLResponse\"\x00\x12b\n" +
+	"\x13GetStudentsByTaskId\x12#.storage.GetStudentsByTaskIdRequest\x1a$.storage.GetStudentsByTaskIdResponse\"\x00B\\ZZgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/gen/go;storagepbb\x06proto3"
 
 var (
 	file_storage_proto_rawDescOnce sync.Once
@@ -411,27 +446,31 @@ func file_storage_proto_rawDescGZIP() []byte {
 	return file_storage_proto_rawDescData
 }
 
-var file_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_storage_proto_goTypes = []any{
-	(*FileMetadata)(nil),     // 0: storage.FileMetadata
-	(*FileChunk)(nil),        // 1: storage.FileChunk
-	(*UploadResponse)(nil),   // 2: storage.UploadResponse
-	(*UploadRequest)(nil),    // 3: storage.UploadRequest
-	(*DownloadRequest)(nil),  // 4: storage.DownloadRequest
-	(*DownloadResponse)(nil), // 5: storage.DownloadResponse
+	(*GenerateUploadURLRequest)(nil),    // 0: storage.GenerateUploadURLRequest
+	(*GenerateUploadURLResponse)(nil),   // 1: storage.GenerateUploadURLResponse
+	(*VerifyUploadedFileRequest)(nil),   // 2: storage.VerifyUploadedFileRequest
+	(*VerifyUploadedFileResponse)(nil),  // 3: storage.VerifyUploadedFileResponse
+	(*GenerateDownloadURLRequest)(nil),  // 4: storage.GenerateDownloadURLRequest
+	(*GenerateDownloadURLResponse)(nil), // 5: storage.GenerateDownloadURLResponse
+	(*GetStudentsByTaskIdRequest)(nil),  // 6: storage.GetStudentsByTaskIdRequest
+	(*GetStudentsByTaskIdResponse)(nil), // 7: storage.GetStudentsByTaskIdResponse
 }
 var file_storage_proto_depIdxs = []int32{
-	0, // 0: storage.UploadRequest.metadata:type_name -> storage.FileMetadata
-	1, // 1: storage.UploadRequest.chunk:type_name -> storage.FileChunk
-	3, // 2: storage.FileStoringService.UploadFile:input_type -> storage.UploadRequest
-	4, // 3: storage.FileStoringService.DownloadFile:input_type -> storage.DownloadRequest
-	2, // 4: storage.FileStoringService.UploadFile:output_type -> storage.UploadResponse
-	5, // 5: storage.FileStoringService.DownloadFile:output_type -> storage.DownloadResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0, // 0: storage.Storage.GenerateUploadURL:input_type -> storage.GenerateUploadURLRequest
+	2, // 1: storage.Storage.VerifyUploadedFile:input_type -> storage.VerifyUploadedFileRequest
+	4, // 2: storage.Storage.GenerateDownloadURL:input_type -> storage.GenerateDownloadURLRequest
+	6, // 3: storage.Storage.GetStudentsByTaskId:input_type -> storage.GetStudentsByTaskIdRequest
+	1, // 4: storage.Storage.GenerateUploadURL:output_type -> storage.GenerateUploadURLResponse
+	3, // 5: storage.Storage.VerifyUploadedFile:output_type -> storage.VerifyUploadedFileResponse
+	5, // 6: storage.Storage.GenerateDownloadURL:output_type -> storage.GenerateDownloadURLResponse
+	7, // 7: storage.Storage.GetStudentsByTaskId:output_type -> storage.GetStudentsByTaskIdResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_storage_proto_init() }
@@ -439,17 +478,13 @@ func file_storage_proto_init() {
 	if File_storage_proto != nil {
 		return
 	}
-	file_storage_proto_msgTypes[3].OneofWrappers = []any{
-		(*UploadRequest_Metadata)(nil),
-		(*UploadRequest_Chunk)(nil),
-	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_storage_proto_rawDesc), len(file_storage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

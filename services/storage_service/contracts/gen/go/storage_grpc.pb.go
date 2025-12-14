@@ -19,145 +19,229 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FileStoringService_UploadFile_FullMethodName   = "/storage.FileStoringService/UploadFile"
-	FileStoringService_DownloadFile_FullMethodName = "/storage.FileStoringService/DownloadFile"
+	Storage_GenerateUploadURL_FullMethodName   = "/storage.Storage/GenerateUploadURL"
+	Storage_VerifyUploadedFile_FullMethodName  = "/storage.Storage/VerifyUploadedFile"
+	Storage_GenerateDownloadURL_FullMethodName = "/storage.Storage/GenerateDownloadURL"
+	Storage_GetStudentsByTaskId_FullMethodName = "/storage.Storage/GetStudentsByTaskId"
 )
 
-// FileStoringServiceClient is the client API for FileStoringService service.
+// StorageClient is the client API for Storage service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // Service for storing files
-type FileStoringServiceClient interface {
-	// Client-streaming RPC
-	UploadFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadRequest, UploadResponse], error)
-	// File download RPC
-	DownloadFile(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadResponse], error)
+type StorageClient interface {
+	// Get upload url RPC
+	GenerateUploadURL(ctx context.Context, in *GenerateUploadURLRequest, opts ...grpc.CallOption) (*GenerateUploadURLResponse, error)
+	// Verify uploaded file RPC
+	VerifyUploadedFile(ctx context.Context, in *VerifyUploadedFileRequest, opts ...grpc.CallOption) (*VerifyUploadedFileResponse, error)
+	// Get download url RPC
+	GenerateDownloadURL(ctx context.Context, in *GenerateDownloadURLRequest, opts ...grpc.CallOption) (*GenerateDownloadURLResponse, error)
+	// Get students ids by task id (those who participated)
+	GetStudentsByTaskId(ctx context.Context, in *GetStudentsByTaskIdRequest, opts ...grpc.CallOption) (*GetStudentsByTaskIdResponse, error)
 }
 
-type fileStoringServiceClient struct {
+type storageClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewFileStoringServiceClient(cc grpc.ClientConnInterface) FileStoringServiceClient {
-	return &fileStoringServiceClient{cc}
+func NewStorageClient(cc grpc.ClientConnInterface) StorageClient {
+	return &storageClient{cc}
 }
 
-func (c *fileStoringServiceClient) UploadFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadRequest, UploadResponse], error) {
+func (c *storageClient) GenerateUploadURL(ctx context.Context, in *GenerateUploadURLRequest, opts ...grpc.CallOption) (*GenerateUploadURLResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &FileStoringService_ServiceDesc.Streams[0], FileStoringService_UploadFile_FullMethodName, cOpts...)
+	out := new(GenerateUploadURLResponse)
+	err := c.cc.Invoke(ctx, Storage_GenerateUploadURL_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[UploadRequest, UploadResponse]{ClientStream: stream}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type FileStoringService_UploadFileClient = grpc.ClientStreamingClient[UploadRequest, UploadResponse]
-
-func (c *fileStoringServiceClient) DownloadFile(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadResponse], error) {
+func (c *storageClient) VerifyUploadedFile(ctx context.Context, in *VerifyUploadedFileRequest, opts ...grpc.CallOption) (*VerifyUploadedFileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &FileStoringService_ServiceDesc.Streams[1], FileStoringService_DownloadFile_FullMethodName, cOpts...)
+	out := new(VerifyUploadedFileResponse)
+	err := c.cc.Invoke(ctx, Storage_VerifyUploadedFile_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[DownloadRequest, DownloadResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type FileStoringService_DownloadFileClient = grpc.ServerStreamingClient[DownloadResponse]
+func (c *storageClient) GenerateDownloadURL(ctx context.Context, in *GenerateDownloadURLRequest, opts ...grpc.CallOption) (*GenerateDownloadURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateDownloadURLResponse)
+	err := c.cc.Invoke(ctx, Storage_GenerateDownloadURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
 
-// FileStoringServiceServer is the server API for FileStoringService service.
-// All implementations must embed UnimplementedFileStoringServiceServer
+func (c *storageClient) GetStudentsByTaskId(ctx context.Context, in *GetStudentsByTaskIdRequest, opts ...grpc.CallOption) (*GetStudentsByTaskIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetStudentsByTaskIdResponse)
+	err := c.cc.Invoke(ctx, Storage_GetStudentsByTaskId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// StorageServer is the server API for Storage service.
+// All implementations must embed UnimplementedStorageServer
 // for forward compatibility.
 //
 // Service for storing files
-type FileStoringServiceServer interface {
-	// Client-streaming RPC
-	UploadFile(grpc.ClientStreamingServer[UploadRequest, UploadResponse]) error
-	// File download RPC
-	DownloadFile(*DownloadRequest, grpc.ServerStreamingServer[DownloadResponse]) error
-	mustEmbedUnimplementedFileStoringServiceServer()
+type StorageServer interface {
+	// Get upload url RPC
+	GenerateUploadURL(context.Context, *GenerateUploadURLRequest) (*GenerateUploadURLResponse, error)
+	// Verify uploaded file RPC
+	VerifyUploadedFile(context.Context, *VerifyUploadedFileRequest) (*VerifyUploadedFileResponse, error)
+	// Get download url RPC
+	GenerateDownloadURL(context.Context, *GenerateDownloadURLRequest) (*GenerateDownloadURLResponse, error)
+	// Get students ids by task id (those who participated)
+	GetStudentsByTaskId(context.Context, *GetStudentsByTaskIdRequest) (*GetStudentsByTaskIdResponse, error)
+	mustEmbedUnimplementedStorageServer()
 }
 
-// UnimplementedFileStoringServiceServer must be embedded to have
+// UnimplementedStorageServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedFileStoringServiceServer struct{}
+type UnimplementedStorageServer struct{}
 
-func (UnimplementedFileStoringServiceServer) UploadFile(grpc.ClientStreamingServer[UploadRequest, UploadResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
+func (UnimplementedStorageServer) GenerateUploadURL(context.Context, *GenerateUploadURLRequest) (*GenerateUploadURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateUploadURL not implemented")
 }
-func (UnimplementedFileStoringServiceServer) DownloadFile(*DownloadRequest, grpc.ServerStreamingServer[DownloadResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
+func (UnimplementedStorageServer) VerifyUploadedFile(context.Context, *VerifyUploadedFileRequest) (*VerifyUploadedFileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyUploadedFile not implemented")
 }
-func (UnimplementedFileStoringServiceServer) mustEmbedUnimplementedFileStoringServiceServer() {}
-func (UnimplementedFileStoringServiceServer) testEmbeddedByValue()                            {}
+func (UnimplementedStorageServer) GenerateDownloadURL(context.Context, *GenerateDownloadURLRequest) (*GenerateDownloadURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateDownloadURL not implemented")
+}
+func (UnimplementedStorageServer) GetStudentsByTaskId(context.Context, *GetStudentsByTaskIdRequest) (*GetStudentsByTaskIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStudentsByTaskId not implemented")
+}
+func (UnimplementedStorageServer) mustEmbedUnimplementedStorageServer() {}
+func (UnimplementedStorageServer) testEmbeddedByValue()                 {}
 
-// UnsafeFileStoringServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FileStoringServiceServer will
+// UnsafeStorageServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StorageServer will
 // result in compilation errors.
-type UnsafeFileStoringServiceServer interface {
-	mustEmbedUnimplementedFileStoringServiceServer()
+type UnsafeStorageServer interface {
+	mustEmbedUnimplementedStorageServer()
 }
 
-func RegisterFileStoringServiceServer(s grpc.ServiceRegistrar, srv FileStoringServiceServer) {
-	// If the following call pancis, it indicates UnimplementedFileStoringServiceServer was
+func RegisterStorageServer(s grpc.ServiceRegistrar, srv StorageServer) {
+	// If the following call pancis, it indicates UnimplementedStorageServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&FileStoringService_ServiceDesc, srv)
+	s.RegisterService(&Storage_ServiceDesc, srv)
 }
 
-func _FileStoringService_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(FileStoringServiceServer).UploadFile(&grpc.GenericServerStream[UploadRequest, UploadResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type FileStoringService_UploadFileServer = grpc.ClientStreamingServer[UploadRequest, UploadResponse]
-
-func _FileStoringService_DownloadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(DownloadRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _Storage_GenerateUploadURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateUploadURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(FileStoringServiceServer).DownloadFile(m, &grpc.GenericServerStream[DownloadRequest, DownloadResponse]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(StorageServer).GenerateUploadURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Storage_GenerateUploadURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServer).GenerateUploadURL(ctx, req.(*GenerateUploadURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type FileStoringService_DownloadFileServer = grpc.ServerStreamingServer[DownloadResponse]
+func _Storage_VerifyUploadedFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyUploadedFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServer).VerifyUploadedFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Storage_VerifyUploadedFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServer).VerifyUploadedFile(ctx, req.(*VerifyUploadedFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
 
-// FileStoringService_ServiceDesc is the grpc.ServiceDesc for FileStoringService service.
+func _Storage_GenerateDownloadURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateDownloadURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServer).GenerateDownloadURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Storage_GenerateDownloadURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServer).GenerateDownloadURL(ctx, req.(*GenerateDownloadURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Storage_GetStudentsByTaskId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStudentsByTaskIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServer).GetStudentsByTaskId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Storage_GetStudentsByTaskId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServer).GetStudentsByTaskId(ctx, req.(*GetStudentsByTaskIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Storage_ServiceDesc is the grpc.ServiceDesc for Storage service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var FileStoringService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "storage.FileStoringService",
-	HandlerType: (*FileStoringServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
+var Storage_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "storage.Storage",
+	HandlerType: (*StorageServer)(nil),
+	Methods: []grpc.MethodDesc{
 		{
-			StreamName:    "UploadFile",
-			Handler:       _FileStoringService_UploadFile_Handler,
-			ClientStreams: true,
+			MethodName: "GenerateUploadURL",
+			Handler:    _Storage_GenerateUploadURL_Handler,
 		},
 		{
-			StreamName:    "DownloadFile",
-			Handler:       _FileStoringService_DownloadFile_Handler,
-			ServerStreams: true,
+			MethodName: "VerifyUploadedFile",
+			Handler:    _Storage_VerifyUploadedFile_Handler,
+		},
+		{
+			MethodName: "GenerateDownloadURL",
+			Handler:    _Storage_GenerateDownloadURL_Handler,
+		},
+		{
+			MethodName: "GetStudentsByTaskId",
+			Handler:    _Storage_GetStudentsByTaskId_Handler,
 		},
 	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "storage.proto",
 }

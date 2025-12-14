@@ -1,9 +1,8 @@
-package db
+package postgres
 
 import (
 	"context"
 	"errors"
-	"storage_service/internal/app/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -11,20 +10,20 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func New(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, error) {
-	if cfg.PostgresAutoMigrate {
-		if err := runMigrations(cfg); err != nil {
+func New(ctx context.Context, autoMigrate bool, pathToStorage string, minConn, maxConn int32) (*pgxpool.Pool, error) {
+	if autoMigrate {
+		if err := runMigrations(pathToStorage); err != nil {
 			return nil, err
 		}
 	}
 
-	pgxCfg, err := pgxpool.ParseConfig(cfg.PostgresURL)
+	pgxCfg, err := pgxpool.ParseConfig(pathToStorage)
 	if err != nil {
 		return nil, err
 	}
 
-	pgxCfg.MaxConns = cfg.PostgresMaxConn
-	pgxCfg.MinConns = cfg.PostgresMinConn
+	pgxCfg.MaxConns = maxConn
+	pgxCfg.MinConns = minConn
 
 	pool, err := pgxpool.NewWithConfig(ctx, pgxCfg)
 	if err != nil {
@@ -39,10 +38,10 @@ func New(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func runMigrations(cfg *config.Config) error {
+func runMigrations(pathToStorage string) error {
 	m, err := migrate.New(
 		"file://migrations",
-		cfg.PostgresURL,
+		pathToStorage,
 	)
 	if err != nil {
 		return err

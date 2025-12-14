@@ -5,23 +5,23 @@ import (
 	"log/slog"
 	"net"
 
-	storageGRPC "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/internal/transport/grpc/storage"
+	"github.com/Nikita-Smirnov-idk/storage-service/internal/transport/grpc/handler"
 	googleGRPC "google.golang.org/grpc"
 )
 
 type Server struct {
-	log        *slog.Logger
+	logger     *slog.Logger
 	gRPCServer *googleGRPC.Server
 	port       int
 }
 
-func New(log *slog.Logger, port int) *Server {
+func New(logger *slog.Logger, port int, service handler.Service) *Server {
 	gRPCServer := googleGRPC.NewServer()
 
-	storageGRPC.Register(gRPCServer)
+	handler.Register(gRPCServer, service, logger)
 
 	return &Server{
-		log:        log,
+		logger:     logger,
 		gRPCServer: gRPCServer,
 		port:       port,
 	}
@@ -34,21 +34,21 @@ func (a *Server) MustRun() {
 }
 
 func (a *Server) Run() error {
-	const op = "grpcApp.Run"
+	const op = "server.Run"
 
-	log := a.log.With(
+	logger := a.logger.With(
 		slog.String("op", op),
 		slog.Int("port", a.port),
 	)
 
-	log.Info("starting gRPC server")
+	logger.Info("starting gRPC server")
 
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	log.Info("grpc server is running", slog.String("addr", l.Addr().String()))
+	logger.Info("grpc server is running", slog.String("addr", l.Addr().String()))
 
 	if err := a.gRPCServer.Serve(l); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -58,9 +58,9 @@ func (a *Server) Run() error {
 }
 
 func (a *Server) Stop() {
-	const op = "grpcApp.Stop"
+	const op = "server.Stop"
 
-	a.log.With(slog.String("op", op)).Info("stopping gRPC server", slog.Int("port", a.port))
+	a.logger.With(slog.String("op", op)).Info("stopping gRPC server", slog.Int("port", a.port))
 
 	a.gRPCServer.GracefulStop()
 }
