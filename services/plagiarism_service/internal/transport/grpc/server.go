@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/Nikita-Smirnov-idk/antiplagiat-service/internal/transport/grpc/handler"
+	"github.com/Nikita-Smirnov-idk/plagiarism-service/internal/transport/grpc/handler"
 	googleGRPC "google.golang.org/grpc"
 )
 
