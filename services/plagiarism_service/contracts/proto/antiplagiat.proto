@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package storage;
+
+option go_package = "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/plagiarism_service/gen/go;plagiarismpb";
+
+// Service for plagiarism analysis
+service Antiplagiat {
+  // Get plagiarism report RPC
+  rpc GetPlagiarismReport(GetPlagiarismReportRequest) returns (GetPlagiarismReportResponse) {}
+}
+
+// Request for url to upload file
+message GetPlagiarismReportRequest {
+  string TaskId = 1;
+}
+
+// Response after plagiarism analysis
+message GetPlagiarismReportResponse {
+  string TaskId = 1;
+}
