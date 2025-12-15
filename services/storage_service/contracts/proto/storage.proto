@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package storage;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/gen/go;storagepb";
 
 // Service for storing files
@@ -15,8 +17,8 @@ service Storage {
   // Get download url RPC
   rpc GenerateDownloadURL(GenerateDownloadURLRequest) returns (GenerateDownloadURLResponse) {}
 
-  // Get students ids by task id (those who participated)
-  rpc GetStudentsByTaskId(GetStudentsByTaskIdRequest) returns (GetStudentsByTaskIdResponse) {}
+  // Get list of info about files by task id
+  rpc ListTaskFiles(ListTaskFilesRequest) returns (ListTaskFilesResponse) {}
 }
 
 // Request for url to upload file
@@ -45,6 +47,7 @@ message VerifyUploadedFileResponse {
 message GenerateDownloadURLRequest {
   string StudentId = 1;
   string TaskId = 2;
+  bool FromInside = 3;
 }
 
 // Response after generating download link
@@ -52,10 +55,19 @@ message GenerateDownloadURLResponse {
   string Url = 1;
 }
 
-message GetStudentsByTaskIdRequest {
+// Request for students ids
+message ListTaskFilesRequest {
   string TaskId = 1;
 }
 
-message GetStudentsByTaskIdResponse {
-  repeated string student_ids = 1;
+// Response for getting students ids
+message ListTaskFilesResponse {
+  repeated FileInfo Items = 1;
+}
+
+// File info
+message FileInfo {
+  string StudentId = 1;
+  google.protobuf.Timestamp UpdatedAt = 2;
+  string Status = 3;
 }

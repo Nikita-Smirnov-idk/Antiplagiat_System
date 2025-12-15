@@ -9,6 +9,7 @@ package storagepb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -222,6 +223,7 @@ type GenerateDownloadURLRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StudentId     string                 `protobuf:"bytes,1,opt,name=StudentId,proto3" json:"StudentId,omitempty"`
 	TaskId        string                 `protobuf:"bytes,2,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
+	FromInside    bool                   `protobuf:"varint,3,opt,name=FromInside,proto3" json:"FromInside,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -270,6 +272,13 @@ func (x *GenerateDownloadURLRequest) GetTaskId() string {
 	return ""
 }
 
+func (x *GenerateDownloadURLRequest) GetFromInside() bool {
+	if x != nil {
+		return x.FromInside
+	}
+	return false
+}
+
 // Response after generating download link
 type GenerateDownloadURLResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -315,27 +324,28 @@ func (x *GenerateDownloadURLResponse) GetUrl() string {
 	return ""
 }
 
-type GetStudentsByTaskIdRequest struct {
+// Request for students ids
+type ListTaskFilesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TaskId        string                 `protobuf:"bytes,1,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetStudentsByTaskIdRequest) Reset() {
-	*x = GetStudentsByTaskIdRequest{}
+func (x *ListTaskFilesRequest) Reset() {
+	*x = ListTaskFilesRequest{}
 	mi := &file_storage_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetStudentsByTaskIdRequest) String() string {
+func (x *ListTaskFilesRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetStudentsByTaskIdRequest) ProtoMessage() {}
+func (*ListTaskFilesRequest) ProtoMessage() {}
 
-func (x *GetStudentsByTaskIdRequest) ProtoReflect() protoreflect.Message {
+func (x *ListTaskFilesRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -347,39 +357,40 @@ func (x *GetStudentsByTaskIdRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetStudentsByTaskIdRequest.ProtoReflect.Descriptor instead.
-func (*GetStudentsByTaskIdRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListTaskFilesRequest.ProtoReflect.Descriptor instead.
+func (*ListTaskFilesRequest) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *GetStudentsByTaskIdRequest) GetTaskId() string {
+func (x *ListTaskFilesRequest) GetTaskId() string {
 	if x != nil {
 		return x.TaskId
 	}
 	return ""
 }
 
-type GetStudentsByTaskIdResponse struct {
+// Response for getting students ids
+type ListTaskFilesResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StudentIds    []string               `protobuf:"bytes,1,rep,name=student_ids,json=studentIds,proto3" json:"student_ids,omitempty"`
+	Items         []*FileInfo            `protobuf:"bytes,1,rep,name=Items,proto3" json:"Items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetStudentsByTaskIdResponse) Reset() {
-	*x = GetStudentsByTaskIdResponse{}
+func (x *ListTaskFilesResponse) Reset() {
+	*x = ListTaskFilesResponse{}
 	mi := &file_storage_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetStudentsByTaskIdResponse) String() string {
+func (x *ListTaskFilesResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetStudentsByTaskIdResponse) ProtoMessage() {}
+func (*ListTaskFilesResponse) ProtoMessage() {}
 
-func (x *GetStudentsByTaskIdResponse) ProtoReflect() protoreflect.Message {
+func (x *ListTaskFilesResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_storage_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -391,23 +402,84 @@ func (x *GetStudentsByTaskIdResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetStudentsByTaskIdResponse.ProtoReflect.Descriptor instead.
-func (*GetStudentsByTaskIdResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListTaskFilesResponse.ProtoReflect.Descriptor instead.
+func (*ListTaskFilesResponse) Descriptor() ([]byte, []int) {
 	return file_storage_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetStudentsByTaskIdResponse) GetStudentIds() []string {
+func (x *ListTaskFilesResponse) GetItems() []*FileInfo {
 	if x != nil {
-		return x.StudentIds
+		return x.Items
 	}
 	return nil
+}
+
+// File info
+type FileInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StudentId     string                 `protobuf:"bytes,1,opt,name=StudentId,proto3" json:"StudentId,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=UpdatedAt,proto3" json:"UpdatedAt,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=Status,proto3" json:"Status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileInfo) Reset() {
+	*x = FileInfo{}
+	mi := &file_storage_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileInfo) ProtoMessage() {}
+
+func (x *FileInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_storage_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
+func (*FileInfo) Descriptor() ([]byte, []int) {
+	return file_storage_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *FileInfo) GetStudentId() string {
+	if x != nil {
+		return x.StudentId
+	}
+	return ""
+}
+
+func (x *FileInfo) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *FileInfo) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
 }
 
 var File_storage_proto protoreflect.FileDescriptor
 
 const file_storage_proto_rawDesc = "" +
 	"\n" +
-	"\rstorage.proto\x12\astorage\"P\n" +
+	"\rstorage.proto\x12\astorage\x1a\x1fgoogle/protobuf/timestamp.proto\"P\n" +
 	"\x18GenerateUploadURLRequest\x12\x1c\n" +
 	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x12\x16\n" +
 	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\"-\n" +
@@ -417,22 +489,28 @@ const file_storage_proto_rawDesc = "" +
 	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x12\x16\n" +
 	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\"4\n" +
 	"\x1aVerifyUploadedFileResponse\x12\x16\n" +
-	"\x06FileId\x18\x01 \x01(\tR\x06FileId\"R\n" +
+	"\x06FileId\x18\x01 \x01(\tR\x06FileId\"r\n" +
 	"\x1aGenerateDownloadURLRequest\x12\x1c\n" +
 	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x12\x16\n" +
-	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\"/\n" +
+	"\x06TaskId\x18\x02 \x01(\tR\x06TaskId\x12\x1e\n" +
+	"\n" +
+	"FromInside\x18\x03 \x01(\bR\n" +
+	"FromInside\"/\n" +
 	"\x1bGenerateDownloadURLResponse\x12\x10\n" +
-	"\x03Url\x18\x01 \x01(\tR\x03Url\"4\n" +
-	"\x1aGetStudentsByTaskIdRequest\x12\x16\n" +
-	"\x06TaskId\x18\x01 \x01(\tR\x06TaskId\">\n" +
-	"\x1bGetStudentsByTaskIdResponse\x12\x1f\n" +
-	"\vstudent_ids\x18\x01 \x03(\tR\n" +
-	"studentIds2\x90\x03\n" +
+	"\x03Url\x18\x01 \x01(\tR\x03Url\".\n" +
+	"\x14ListTaskFilesRequest\x12\x16\n" +
+	"\x06TaskId\x18\x01 \x01(\tR\x06TaskId\"@\n" +
+	"\x15ListTaskFilesResponse\x12'\n" +
+	"\x05Items\x18\x01 \x03(\v2\x11.storage.FileInfoR\x05Items\"z\n" +
+	"\bFileInfo\x12\x1c\n" +
+	"\tStudentId\x18\x01 \x01(\tR\tStudentId\x128\n" +
+	"\tUpdatedAt\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tUpdatedAt\x12\x16\n" +
+	"\x06Status\x18\x03 \x01(\tR\x06Status2\xfe\x02\n" +
 	"\aStorage\x12\\\n" +
 	"\x11GenerateUploadURL\x12!.storage.GenerateUploadURLRequest\x1a\".storage.GenerateUploadURLResponse\"\x00\x12_\n" +
 	"\x12VerifyUploadedFile\x12\".storage.VerifyUploadedFileRequest\x1a#.storage.VerifyUploadedFileResponse\"\x00\x12b\n" +
-	"\x13GenerateDownloadURL\x12#.storage.GenerateDownloadURLRequest\x1a$.storage.GenerateDownloadURLResponse\"\x00\x12b\n" +
-	"\x13GetStudentsByTaskId\x12#.storage.GetStudentsByTaskIdRequest\x1a$.storage.GetStudentsByTaskIdResponse\"\x00B\\ZZgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/gen/go;storagepbb\x06proto3"
+	"\x13GenerateDownloadURL\x12#.storage.GenerateDownloadURLRequest\x1a$.storage.GenerateDownloadURLResponse\"\x00\x12P\n" +
+	"\rListTaskFiles\x12\x1d.storage.ListTaskFilesRequest\x1a\x1e.storage.ListTaskFilesResponse\"\x00B\\ZZgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/gen/go;storagepbb\x06proto3"
 
 var (
 	file_storage_proto_rawDescOnce sync.Once
@@ -446,7 +524,7 @@ func file_storage_proto_rawDescGZIP() []byte {
 	return file_storage_proto_rawDescData
 }
 
-var file_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_storage_proto_goTypes = []any{
 	(*GenerateUploadURLRequest)(nil),    // 0: storage.GenerateUploadURLRequest
 	(*GenerateUploadURLResponse)(nil),   // 1: storage.GenerateUploadURLResponse
@@ -454,23 +532,27 @@ var file_storage_proto_goTypes = []any{
 	(*VerifyUploadedFileResponse)(nil),  // 3: storage.VerifyUploadedFileResponse
 	(*GenerateDownloadURLRequest)(nil),  // 4: storage.GenerateDownloadURLRequest
 	(*GenerateDownloadURLResponse)(nil), // 5: storage.GenerateDownloadURLResponse
-	(*GetStudentsByTaskIdRequest)(nil),  // 6: storage.GetStudentsByTaskIdRequest
-	(*GetStudentsByTaskIdResponse)(nil), // 7: storage.GetStudentsByTaskIdResponse
+	(*ListTaskFilesRequest)(nil),        // 6: storage.ListTaskFilesRequest
+	(*ListTaskFilesResponse)(nil),       // 7: storage.ListTaskFilesResponse
+	(*FileInfo)(nil),                    // 8: storage.FileInfo
+	(*timestamppb.Timestamp)(nil),       // 9: google.protobuf.Timestamp
 }
 var file_storage_proto_depIdxs = []int32{
-	0, // 0: storage.Storage.GenerateUploadURL:input_type -> storage.GenerateUploadURLRequest
-	2, // 1: storage.Storage.VerifyUploadedFile:input_type -> storage.VerifyUploadedFileRequest
-	4, // 2: storage.Storage.GenerateDownloadURL:input_type -> storage.GenerateDownloadURLRequest
-	6, // 3: storage.Storage.GetStudentsByTaskId:input_type -> storage.GetStudentsByTaskIdRequest
-	1, // 4: storage.Storage.GenerateUploadURL:output_type -> storage.GenerateUploadURLResponse
-	3, // 5: storage.Storage.VerifyUploadedFile:output_type -> storage.VerifyUploadedFileResponse
-	5, // 6: storage.Storage.GenerateDownloadURL:output_type -> storage.GenerateDownloadURLResponse
-	7, // 7: storage.Storage.GetStudentsByTaskId:output_type -> storage.GetStudentsByTaskIdResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	8, // 0: storage.ListTaskFilesResponse.Items:type_name -> storage.FileInfo
+	9, // 1: storage.FileInfo.UpdatedAt:type_name -> google.protobuf.Timestamp
+	0, // 2: storage.Storage.GenerateUploadURL:input_type -> storage.GenerateUploadURLRequest
+	2, // 3: storage.Storage.VerifyUploadedFile:input_type -> storage.VerifyUploadedFileRequest
+	4, // 4: storage.Storage.GenerateDownloadURL:input_type -> storage.GenerateDownloadURLRequest
+	6, // 5: storage.Storage.ListTaskFiles:input_type -> storage.ListTaskFilesRequest
+	1, // 6: storage.Storage.GenerateUploadURL:output_type -> storage.GenerateUploadURLResponse
+	3, // 7: storage.Storage.VerifyUploadedFile:output_type -> storage.VerifyUploadedFileResponse
+	5, // 8: storage.Storage.GenerateDownloadURL:output_type -> storage.GenerateDownloadURLResponse
+	7, // 9: storage.Storage.ListTaskFiles:output_type -> storage.ListTaskFilesResponse
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_storage_proto_init() }
@@ -484,7 +566,7 @@ func file_storage_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_storage_proto_rawDesc), len(file_storage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

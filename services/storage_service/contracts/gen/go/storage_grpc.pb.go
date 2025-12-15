@@ -22,7 +22,7 @@ const (
 	Storage_GenerateUploadURL_FullMethodName   = "/storage.Storage/GenerateUploadURL"
 	Storage_VerifyUploadedFile_FullMethodName  = "/storage.Storage/VerifyUploadedFile"
 	Storage_GenerateDownloadURL_FullMethodName = "/storage.Storage/GenerateDownloadURL"
-	Storage_GetStudentsByTaskId_FullMethodName = "/storage.Storage/GetStudentsByTaskId"
+	Storage_ListTaskFiles_FullMethodName       = "/storage.Storage/ListTaskFiles"
 )
 
 // StorageClient is the client API for Storage service.
@@ -37,8 +37,8 @@ type StorageClient interface {
 	VerifyUploadedFile(ctx context.Context, in *VerifyUploadedFileRequest, opts ...grpc.CallOption) (*VerifyUploadedFileResponse, error)
 	// Get download url RPC
 	GenerateDownloadURL(ctx context.Context, in *GenerateDownloadURLRequest, opts ...grpc.CallOption) (*GenerateDownloadURLResponse, error)
-	// Get students ids by task id (those who participated)
-	GetStudentsByTaskId(ctx context.Context, in *GetStudentsByTaskIdRequest, opts ...grpc.CallOption) (*GetStudentsByTaskIdResponse, error)
+	// Get list of info about files by task id
+	ListTaskFiles(ctx context.Context, in *ListTaskFilesRequest, opts ...grpc.CallOption) (*ListTaskFilesResponse, error)
 }
 
 type storageClient struct {
@@ -79,10 +79,10 @@ func (c *storageClient) GenerateDownloadURL(ctx context.Context, in *GenerateDow
 	return out, nil
 }
 
-func (c *storageClient) GetStudentsByTaskId(ctx context.Context, in *GetStudentsByTaskIdRequest, opts ...grpc.CallOption) (*GetStudentsByTaskIdResponse, error) {
+func (c *storageClient) ListTaskFiles(ctx context.Context, in *ListTaskFilesRequest, opts ...grpc.CallOption) (*ListTaskFilesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetStudentsByTaskIdResponse)
-	err := c.cc.Invoke(ctx, Storage_GetStudentsByTaskId_FullMethodName, in, out, cOpts...)
+	out := new(ListTaskFilesResponse)
+	err := c.cc.Invoke(ctx, Storage_ListTaskFiles_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +101,8 @@ type StorageServer interface {
 	VerifyUploadedFile(context.Context, *VerifyUploadedFileRequest) (*VerifyUploadedFileResponse, error)
 	// Get download url RPC
 	GenerateDownloadURL(context.Context, *GenerateDownloadURLRequest) (*GenerateDownloadURLResponse, error)
-	// Get students ids by task id (those who participated)
-	GetStudentsByTaskId(context.Context, *GetStudentsByTaskIdRequest) (*GetStudentsByTaskIdResponse, error)
+	// Get list of info about files by task id
+	ListTaskFiles(context.Context, *ListTaskFilesRequest) (*ListTaskFilesResponse, error)
 	mustEmbedUnimplementedStorageServer()
 }
 
@@ -122,8 +122,8 @@ func (UnimplementedStorageServer) VerifyUploadedFile(context.Context, *VerifyUpl
 func (UnimplementedStorageServer) GenerateDownloadURL(context.Context, *GenerateDownloadURLRequest) (*GenerateDownloadURLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateDownloadURL not implemented")
 }
-func (UnimplementedStorageServer) GetStudentsByTaskId(context.Context, *GetStudentsByTaskIdRequest) (*GetStudentsByTaskIdResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetStudentsByTaskId not implemented")
+func (UnimplementedStorageServer) ListTaskFiles(context.Context, *ListTaskFilesRequest) (*ListTaskFilesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTaskFiles not implemented")
 }
 func (UnimplementedStorageServer) mustEmbedUnimplementedStorageServer() {}
 func (UnimplementedStorageServer) testEmbeddedByValue()                 {}
@@ -200,20 +200,20 @@ func _Storage_GenerateDownloadURL_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Storage_GetStudentsByTaskId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetStudentsByTaskIdRequest)
+func _Storage_ListTaskFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTaskFilesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StorageServer).GetStudentsByTaskId(ctx, in)
+		return srv.(StorageServer).ListTaskFiles(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Storage_GetStudentsByTaskId_FullMethodName,
+		FullMethod: Storage_ListTaskFiles_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StorageServer).GetStudentsByTaskId(ctx, req.(*GetStudentsByTaskIdRequest))
+		return srv.(StorageServer).ListTaskFiles(ctx, req.(*ListTaskFilesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -238,8 +238,8 @@ var Storage_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Storage_GenerateDownloadURL_Handler,
 		},
 		{
-			MethodName: "GetStudentsByTaskId",
-			Handler:    _Storage_GetStudentsByTaskId_Handler,
+			MethodName: "ListTaskFiles",
+			Handler:    _Storage_ListTaskFiles_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -88,7 +88,7 @@ func (s *Repo) VerifyUploadedFile(key string) error {
 	return nil
 }
 
-func (s *Repo) GenerateDownloadURL(key string) (string, error) {
+func (s *Repo) GenerateDownloadURL(key string, fromInside bool) (string, error) {
 	const op = "S3.REPO.GenerateDownloadURL"
 
 	logger := s.logger.With(
@@ -96,7 +96,15 @@ func (s *Repo) GenerateDownloadURL(key string) (string, error) {
 		slog.String("file key", key),
 	)
 
-	req, _ := s.Storage.externalClient.GetObjectRequest(&s3.GetObjectInput{
+	var client *s3.S3
+
+	if fromInside {
+		client = s.Storage.internalClient
+	} else {
+		client = s.Storage.externalClient
+	}
+
+	req, _ := client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(s.Storage.bucket),
 		Key:    aws.String(key),
 	})
