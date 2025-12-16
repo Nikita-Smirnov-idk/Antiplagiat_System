@@ -510,7 +510,7 @@ const file_storage_proto_rawDesc = "" +
 	"\x11GenerateUploadURL\x12!.storage.GenerateUploadURLRequest\x1a\".storage.GenerateUploadURLResponse\"\x00\x12_\n" +
 	"\x12VerifyUploadedFile\x12\".storage.VerifyUploadedFileRequest\x1a#.storage.VerifyUploadedFileResponse\"\x00\x12b\n" +
 	"\x13GenerateDownloadURL\x12#.storage.GenerateDownloadURLRequest\x1a$.storage.GenerateDownloadURLResponse\"\x00\x12P\n" +
-	"\rListTaskFiles\x12\x1d.storage.ListTaskFilesRequest\x1a\x1e.storage.ListTaskFilesResponse\"\x00B\\ZZgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/gen/go;storagepbb\x06proto3"
+	"\rListTaskFiles\x12\x1d.storage.ListTaskFilesRequest\x1a\x1e.storage.ListTaskFilesResponse\"\x00BfZdgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/contracts/gen/go;storagepbb\x06proto3"
 
 var (
 	file_storage_proto_rawDescOnce sync.Once

@@ -48,13 +48,11 @@ func (h *Handler) GenerateUploadURL(ctx context.Context, req *gen.GenerateUpload
 		}
 	}()
 
-	if req.GetStudentId() == "" || req.GetTaskId() == "" {
-		logger.Warn("StudentId and TaskId were not given")
-		return nil, status.Error(
-			codes.InvalidArgument,
-			"StudentId and TaskId are required",
-		)
+	err := ValidateTaskAndStudentIds(req.GetTaskId(), req.GetStudentId(), h.logger)
+	if err != nil {
+		return nil, err
 	}
+
 	url, err := h.service.GenerateUploadURL(ctx, req.GetStudentId(), req.GetTaskId())
 
 	if err != nil {
@@ -89,12 +87,9 @@ func (h *Handler) VerifyUploadedFile(ctx context.Context, req *gen.VerifyUploade
 		}
 	}()
 
-	if req.GetStudentId() == "" || req.GetTaskId() == "" {
-		logger.Warn("StudentId and TaskId were not given")
-		return nil, status.Error(
-			codes.InvalidArgument,
-			"student_id and task_id are required",
-		)
+	err := ValidateTaskAndStudentIds(req.GetTaskId(), req.GetStudentId(), h.logger)
+	if err != nil {
+		return nil, err
 	}
 
 	fileId, err := h.service.VerifyUploadedFile(ctx, req.GetStudentId(), req.GetTaskId())
@@ -132,13 +127,11 @@ func (h *Handler) GenerateDownloadURL(ctx context.Context, req *gen.GenerateDown
 		}
 	}()
 
-	if req.GetStudentId() == "" || req.GetTaskId() == "" {
-		logger.Warn("StudentId and TaskId were not given")
-		return nil, status.Error(
-			codes.InvalidArgument,
-			"student_id and task_id are required",
-		)
+	err := ValidateTaskAndStudentIds(req.GetTaskId(), req.GetStudentId(), h.logger)
+	if err != nil {
+		return nil, err
 	}
+
 	url, err := h.service.GenerateDownloadURL(ctx, req.GetStudentId(), req.GetTaskId(), req.GetFromInside())
 
 	if err != nil {
@@ -181,13 +174,11 @@ func (h *Handler) ListTaskFiles(ctx context.Context, req *gen.ListTaskFilesReque
 		}
 	}()
 
-	if req.GetTaskId() == "" {
-		logger.Warn("TaskId was not given")
-		return nil, status.Error(
-			codes.InvalidArgument,
-			"task_id is required",
-		)
+	err := ValidateTaskId(req.GetTaskId(), h.logger)
+	if err != nil {
+		return nil, err
 	}
+
 	files, err := h.service.ListTaskFiles(ctx, req.GetTaskId())
 
 	if err != nil {

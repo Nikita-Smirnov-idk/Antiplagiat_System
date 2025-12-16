@@ -1,21 +1,31 @@
 syntax = "proto3";
 
 package storage;
+import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/plagiarism_service/gen/go;plagiarismpb";
+option go_package = "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/plagiarism_service/contracts/gen/go;plagiarismpb";
 
 // Service for plagiarism analysis
-service Antiplagiat {
-  // Get plagiarism report RPC
+service Plagiarism {
+  // Get plagiarism report for a task
   rpc GetPlagiarismReport(GetPlagiarismReportRequest) returns (GetPlagiarismReportResponse) {}
 }
 
-// Request for url to upload file
+// Request for plagiarism report
 message GetPlagiarismReportRequest {
-  string TaskId = 1;
+  string task_id = 1;
 }
 
-// Response after plagiarism analysis
+// Response with plagiarism report
 message GetPlagiarismReportResponse {
-  string TaskId = 1;
+  repeated PlagiarismReport Reports = 1;
+  google.protobuf.Timestamp StartedAt = 2;
+}
+
+// Main report for a task
+message PlagiarismReport {
+  string Student = 1;
+  string StudentWithSimilarFile = 2;
+  double MaxSimilarity = 3;
+  google.protobuf.Timestamp FileHandedOverAt = 4;
 }

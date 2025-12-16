@@ -15,7 +15,7 @@ type Server struct {
 	port       int
 }
 
-func New(logger *slog.Logger, port int, service handler.Service) *Server {
+func New(logger *slog.Logger, port int, service handler.PlagiarismService) *Server {
 	gRPCServer := googleGRPC.NewServer()
 
 	handler.Register(gRPCServer, service, logger)
