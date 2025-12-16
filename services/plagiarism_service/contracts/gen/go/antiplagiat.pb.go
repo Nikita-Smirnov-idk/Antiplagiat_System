@@ -25,7 +25,7 @@ const (
 // Request for plagiarism report
 type GetPlagiarismReportRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=TaskId,proto3" json:"TaskId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -193,9 +193,9 @@ var File_antiplagiat_proto protoreflect.FileDescriptor
 
 const file_antiplagiat_proto_rawDesc = "" +
 	"\n" +
-	"\x11antiplagiat.proto\x12\astorage\x1a\x1fgoogle/protobuf/timestamp.proto\"5\n" +
-	"\x1aGetPlagiarismReportRequest\x12\x17\n" +
-	"\atask_id\x18\x01 \x01(\tR\x06taskId\"\x8c\x01\n" +
+	"\x11antiplagiat.proto\x12\astorage\x1a\x1fgoogle/protobuf/timestamp.proto\"4\n" +
+	"\x1aGetPlagiarismReportRequest\x12\x16\n" +
+	"\x06TaskId\x18\x01 \x01(\tR\x06TaskId\"\x8c\x01\n" +
 	"\x1bGetPlagiarismReportResponse\x123\n" +
 	"\aReports\x18\x01 \x03(\v2\x19.storage.PlagiarismReportR\aReports\x128\n" +
 	"\tStartedAt\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tStartedAt\"\xd2\x01\n" +
@@ -206,7 +206,7 @@ const file_antiplagiat_proto_rawDesc = "" +
 	"\x10FileHandedOverAt\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x10FileHandedOverAt2p\n" +
 	"\n" +
 	"Plagiarism\x12b\n" +
-	"\x13GetPlagiarismReport\x12#.storage.GetPlagiarismReportRequest\x1a$.storage.GetPlagiarismReportResponse\"\x00BlZjgithub.com/Nikita-Smirnov-idk/Antiplagiat_System/services/plagiarism_service/contracts/gen/go;plagiarismpbb\x06proto3"
+	"\x13GetPlagiarismReport\x12#.storage.GetPlagiarismReportRequest\x1a$.storage.GetPlagiarismReportResponse\"\x00BPZNgithub.com/Nikita-Smirnov-idk/plagiarism-service/contracts/gen/go;plagiarismpbb\x06proto3"
 
 var (
 	file_antiplagiat_proto_rawDescOnce sync.Once

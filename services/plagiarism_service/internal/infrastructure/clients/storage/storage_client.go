@@ -6,28 +6,26 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type StorageClient struct {
-	client storagepb.StorageClient
+type Storage struct {
+	Client storagepb.StorageClient
 	conn   *grpc.ClientConn
 }
 
-func NewStorageClient(addr string) (*StorageClient, error) {
-	// Создаем соединение
-	conn, err := grpc.Dial(addr,
+func NewStorageClient(addr string) (*Storage, error) {
+	conn, err := grpc.NewClient(addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
 
-	// Создаем клиента
 	client := storagepb.NewStorageClient(conn)
 
-	return &StorageClient{
-		client: client,
+	return &Storage{
+		Client: client,
 		conn:   conn,
 	}, nil
 }
 
-func (c *StorageClient) Close() {
+func (c *Storage) Close() {
 	c.conn.Close()
 }

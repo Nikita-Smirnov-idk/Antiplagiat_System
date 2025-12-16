@@ -1,15 +1,11 @@
 package text_extractor
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
 )
 
 type TextExtractor struct {
@@ -26,19 +22,29 @@ func NewTextExtractor() *TextExtractor {
 func (e *TextExtractor) ExtractFromURL(fileURL string) (string, error) {
 	resp, err := e.httpClient.Get(fileURL)
 	if err != nil {
-		return "", fmt.Errorf("failed to download file: %w", err)
+		return "", fmt.Errorf("failed to download file from URL %s: %w", fileURL, err)
 	}
 	defer resp.Body.Close()
 
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read file: %w", err)
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to download file: HTTP status %d", resp.StatusCode)
 	}
 
-	contentType := http.DetectContentType(data)
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read file content: %w", err)
+	}
 
-	if strings.Contains(contentType, "pdf") {
-		return e.extractFromPDF(data)
+	contentType := resp.Header.Get("Content-Type")
+	detectedType := http.DetectContentType(data)
+
+	isTextFile := strings.Contains(contentType, "text/plain") ||
+		strings.Contains(contentType, "text/") ||
+		strings.Contains(detectedType, "text/plain") ||
+		strings.Contains(detectedType, "text/")
+
+	if !isTextFile {
+		return "", fmt.Errorf("can not extract")
 	}
 
 	text := string(data)
@@ -54,48 +60,6 @@ func (e *TextExtractor) ExtractFromURL(fileURL string) (string, error) {
 	}, text)
 
 	return strings.Join(strings.Fields(text), " "), nil
-}
-
-// extractFromPDF извлекает текст из PDF
-func (e *TextExtractor) extractFromPDF(data []byte) (string, error) {
-	reader := bytes.NewReader(data)
-
-	pdfReader, err := model.NewPdfReader(reader)
-	if err != nil {
-		return "", fmt.Errorf("failed to create PDF reader: %w", err)
-	}
-
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return "", fmt.Errorf("failed to get page count: %w", err)
-	}
-
-	var textBuilder strings.Builder
-
-	for i := 1; i <= numPages; i++ {
-		page, err := pdfReader.GetPage(i)
-		if err != nil {
-			continue
-		}
-
-		ex, err := extractor.New(page)
-		if err != nil {
-			continue
-		}
-
-		pageText, err := ex.ExtractText()
-		if err == nil && pageText != "" {
-			textBuilder.WriteString(pageText)
-			textBuilder.WriteString("\n")
-		}
-	}
-
-	result := textBuilder.String()
-	if result == "" {
-		return "", fmt.Errorf("failed to extract text from PDF")
-	}
-
-	return result, nil
 }
 
 // CleanText очищает текст для сравнения

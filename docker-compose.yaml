@@ -1,0 +1,162 @@
+services:
+  storage-postgres:
+    image: postgres:16-alpine
+    container_name: storage-postgres
+    environment:
+      POSTGRES_USER: storage_user
+      POSTGRES_PASSWORD: storage_password
+      POSTGRES_DB: storage_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - storage_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U storage_user -d storage_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - antiplagiat-network
+
+  storage-minio:
+    image: minio/minio:latest
+    container_name: storage-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - storage_minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - antiplagiat-network
+
+  storage-minio-init:
+    image: minio/mc:latest
+    container_name: storage-minio-init
+    depends_on:
+      storage-minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://storage-minio:9000 minioadmin minioadmin;
+      mc mb myminio/storage-bucket --ignore-existing;
+      mc anonymous set none myminio/storage-bucket;
+      exit 0;
+      "
+    networks:
+      - antiplagiat-network
+
+  storage-service:
+    build:
+      context: ./services/storage_service
+      dockerfile: Dockerfile
+    container_name: storage-service
+    depends_on:
+      storage-postgres:
+        condition: service_healthy
+      storage-minio:
+        condition: service_healthy
+      storage-minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "5001:5001"
+    environment:
+      POSTGRES_PATH: postgres://storage_user:storage_password@storage-postgres:5432/storage_db?sslmode=disable
+      S3_ENDPOINT: http://storage-minio:9000
+      S3_CLIENT_ENDPOINT: http://localhost:9000
+      ENV: local
+      GRPC_PORT: 5001
+      GRPC_TIMEOUT: 5s
+      POSTGRES_MAX_CONN: 20
+      POSTGRES_MIN_CONN: 5
+      POSTGRES_AUTO_MIGRATE: true
+      S3_BUCKET: storage-bucket
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_EXPIRATION_TIME: 5
+    networks:
+      - antiplagiat-network
+    restart: unless-stopped
+
+  plagiarism-postgres:
+    image: postgres:16-alpine
+    container_name: plagiarism-postgres
+    environment:
+      POSTGRES_USER: plagiarism_user
+      POSTGRES_PASSWORD: plagiarism_password
+      POSTGRES_DB: plagiarism_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - plagiarism_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plagiarism_user -d plagiarism_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - antiplagiat-network
+
+  plagiarism-service:
+    build:
+      context: ./services
+      dockerfile: plagiarism_service/Dockerfile
+    container_name: plagiarism-service
+    depends_on:
+      plagiarism-postgres:
+        condition: service_healthy
+      storage-service:
+        condition: service_started
+    ports:
+      - "6001:6001"
+    environment:
+      POSTGRES_PATH: postgres://plagiarism_user:plagiarism_password@plagiarism-postgres:5432/plagiarism_db?sslmode=disable
+      STORAGE_ADDR: storage-service:5001
+      ENV: local
+      GRPC_PORT: 6001
+      GRPC_TIMEOUT: 5s
+      POSTGRES_MAX_CONN: 20
+      POSTGRES_MIN_CONN: 5
+      POSTGRES_AUTO_MIGRATE: true
+    networks:
+      - antiplagiat-network
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api_gateway/Dockerfile
+    container_name: api-gateway
+    depends_on:
+      storage-service:
+        condition: service_started
+      plagiarism-service:
+        condition: service_started
+    ports:
+      - "${HTTP_PORT:-8080}:${HTTP_PORT:-8080}"
+    environment:
+      HTTP_PORT: ${HTTP_PORT:-8080}
+      STORAGE_ADDR: ${STORAGE_ADDR:-storage-service:5001}
+      ANALYSIS_ADDR: ${ANALYSIS_ADDR:-plagiarism-service:6001}
+    networks:
+      - antiplagiat-network
+    restart: unless-stopped
+
+volumes:
+  storage_postgres_data:
+  storage_minio_data:
+  plagiarism_postgres_data:
+
+networks:
+  antiplagiat-network:
+    driver: bridge
+

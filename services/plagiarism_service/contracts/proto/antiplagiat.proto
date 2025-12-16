@@ -3,7 +3,7 @@ syntax = "proto3";
 package storage;
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/plagiarism_service/contracts/gen/go;plagiarismpb";
+option go_package = "github.com/Nikita-Smirnov-idk/plagiarism-service/contracts/gen/go;plagiarismpb";
 
 // Service for plagiarism analysis
 service Plagiarism {
@@ -13,7 +13,7 @@ service Plagiarism {
 
 // Request for plagiarism report
 message GetPlagiarismReportRequest {
-  string task_id = 1;
+  string TaskId = 1;
 }
 
 // Response with plagiarism report

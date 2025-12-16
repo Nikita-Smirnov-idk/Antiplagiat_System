@@ -4,7 +4,7 @@ package storage;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/Nikita-Smirnov-idk/Antiplagiat_System/services/storage_service/contracts/gen/go;storagepb";
+option go_package = "github.com/Nikita-Smirnov-idk/storage-service/contracts/gen/go;storagepb";
 
 // Service for storing files
 service Storage {

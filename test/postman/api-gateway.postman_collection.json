@@ -1,0 +1,65 @@
+{
+  "info": {
+    "name": "Antiplagiat API Gateway",
+    "_postman_id": "8c6c2d7c-9f6e-4b1a-9cf8-6f6a9f0b9d01",
+    "description": "Gateway: upload, verify, analyze, download link",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Upload file",
+      "request": {
+        "method": "POST",
+        "header": [],
+      "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task_id\": \"123\",\n  \"student_id\": \"s1\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/files", "host": [ "{{base_url}}" ], "path": [ "api", "files" ] }
+      }
+    },
+    {
+      "name": "Verify uploaded file",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task_id\": \"123\",\n  \"student_id\": \"s1\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/files/verify", "host": [ "{{base_url}}" ], "path": [ "api", "files", "verify" ] }
+      }
+    },
+    {
+      "name": "Analyze task",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "url": {
+          "raw": "{{base_url}}/api/analysis/{{task_id}}",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "analysis", "{{task_id}}" ]
+        }
+      }
+    },
+    {
+      "name": "Get download URL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/files/{{task_id}}/{{student_id}}/download",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "files", "{{task_id}}", "{{student_id}}", "download" ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080" },
+    { "key": "task_id", "value": "123" },
+    { "key": "student_id", "value": "s1" }
+  ]
+}
+
+

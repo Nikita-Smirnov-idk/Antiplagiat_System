@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Env  string         `env:"ENV" env-default:"local"`
-	GRPC GRPCConfig     `env-prefix:"GRPC_"`
-	DB   PostgresConfig `env-prefix:"POSTGRES_"`
+	Env     string         `env:"ENV" env-default:"local"`
+	GRPC    GRPCConfig     `env-prefix:"GRPC_"`
+	DB      PostgresConfig `env-prefix:"POSTGRES_"`
+	Storage StorageConfig  `env-prefix:"STORAGE_"`
 }
 
 type PostgresConfig struct {
@@ -20,8 +21,12 @@ type PostgresConfig struct {
 }
 
 type GRPCConfig struct {
-	Port    int           `env:"PORT" env-default:"5001"`
+	Port    int           `env:"PORT" env-default:"6001"`
 	TimeOut time.Duration `env:"TIMEOUT" env-default:"5s"`
+}
+
+type StorageConfig struct {
+	Addr string `env:"ADDR" env-default:"storage-service:5001"`
 }
 
 func MustLoad() *Config {

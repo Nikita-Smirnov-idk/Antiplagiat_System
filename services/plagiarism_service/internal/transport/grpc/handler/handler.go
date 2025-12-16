@@ -2,16 +2,19 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	gen "github.com/Nikita-Smirnov-idk/plagiarism-service/contracts/gen/go"
 	"github.com/Nikita-Smirnov-idk/plagiarism-service/internal/use_cases"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type PlagiarismService interface {
-	GetPlagiarismReport(ctx context.Context, taskId string) (use_cases.Task, error)
+	GetPlagiarismReport(ctx context.Context, taskId string) (*use_cases.Task, error)
 }
 
 type Handler struct {
@@ -41,6 +44,8 @@ func (h *Handler) GetPlagiarismReport(ctx context.Context, req *gen.GetPlagiaris
 		}
 	}()
 
+	logger.Info("starting analysis...")
+
 	err := ValidateTaskId(req.GetTaskId(), h.logger)
 	if err != nil {
 		return nil, err
@@ -49,7 +54,25 @@ func (h *Handler) GetPlagiarismReport(ctx context.Context, req *gen.GetPlagiaris
 	taskReport, err := h.service.GetPlagiarismReport(ctx, req.GetTaskId())
 
 	if err != nil {
-		return nil, err
+		var analysisErr *use_cases.AnalysisError
+		if errors.As(err, &analysisErr) {
+			logger.Error("analysis failed", "error", err)
+			return nil, status.Error(codes.FailedPrecondition, analysisErr.Error())
+		}
+		if errors.Is(err, use_cases.ErrExternalConnectionFailed) {
+			logger.Error("failed connection with external service", "error", err)
+			return nil, status.Error(codes.Unavailable, "failed to connect to storage service")
+		}
+		if errors.Is(err, use_cases.ErrFileExtractionFailed) {
+			logger.Error("file extraction failed", "error", err)
+			return nil, status.Error(codes.InvalidArgument, "failed to extract text from file: file may be corrupted or unsupported format")
+		}
+		if errors.Is(err, use_cases.ErrFileDownloadFailed) {
+			logger.Error("file download failed", "error", err)
+			return nil, status.Error(codes.Unavailable, "failed to download file from storage")
+		}
+		logger.Error("internal error", "error", err)
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	var result []*gen.PlagiarismReport

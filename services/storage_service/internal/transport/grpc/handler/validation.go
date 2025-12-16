@@ -34,6 +34,7 @@ func ValidateTaskId(taskId string, log *slog.Logger) error {
 
 	logger := log.With(
 		slog.String("op", op),
+		slog.String("id", taskId),
 	)
 
 	err := ValidateIdWrapped(taskId, "task", logger)
