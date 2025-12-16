@@ -2,7 +2,7 @@
   "info": {
     "name": "Antiplagiat API Gateway",
     "_postman_id": "8c6c2d7c-9f6e-4b1a-9cf8-6f6a9f0b9d01",
-    "description": "Gateway: upload, verify, analyze, download link",
+    "description": "Gateway: upload, verify, analyze, download link, word cloud",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -10,37 +10,158 @@
       "name": "Upload file",
       "request": {
         "method": "POST",
-        "header": [],
-      "body": {
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
           "mode": "raw",
           "raw": "{\n  \"task_id\": \"123\",\n  \"student_id\": \"s1\"\n}"
         },
-        "url": { "raw": "{{base_url}}/api/files", "host": [ "{{base_url}}" ], "path": [ "api", "files" ] }
-      }
+        "url": { 
+          "raw": "{{base_url}}/api/files", 
+          "host": [ "{{base_url}}" ], 
+          "path": [ "api", "files" ] 
+        },
+        "description": "Generates a presigned URL for uploading a file. After receiving the URL, upload the file using PUT request to that URL."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task_id\": \"123\",\n  \"student_id\": \"s1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/files",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "files" ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"upload_url\": \"https://minio.example.com/presigned-url\"\n}"
+        }
+      ]
     },
     {
       "name": "Verify uploaded file",
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"task_id\": \"123\",\n  \"student_id\": \"s1\"\n}"
         },
-        "url": { "raw": "{{base_url}}/api/files/verify", "host": [ "{{base_url}}" ], "path": [ "api", "files", "verify" ] }
-      }
+        "url": { 
+          "raw": "{{base_url}}/api/files/verify", 
+          "host": [ "{{base_url}}" ], 
+          "path": [ "api", "files", "verify" ] 
+        },
+        "description": "Verifies that the file was successfully uploaded. Returns file_id if file exists."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task_id\": \"123\",\n  \"student_id\": \"s1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/files/verify",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "files", "verify" ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"file_id\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
+        }
+      ]
     },
     {
       "name": "Analyze task",
       "request": {
         "method": "POST",
-        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "header": [ 
+          { 
+            "key": "Content-Type", 
+            "value": "application/json" 
+          } 
+        ],
         "url": {
           "raw": "{{base_url}}/api/analysis/{{task_id}}",
           "host": [ "{{base_url}}" ],
           "path": [ "api", "analysis", "{{task_id}}" ]
+        },
+        "description": "Runs plagiarism analysis for all files in the specified task. Returns reports with similarity scores."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analysis/{{task_id}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "analysis", "{{task_id}}" ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"task_id\": \"123\",\n  \"started_at\": \"2024-01-01T12:00:00Z\",\n  \"reports\": [\n    {\n      \"student\": \"s1\",\n      \"student_with_similar_file\": \"s2\",\n      \"max_similarity\": 0.85,\n      \"file_handed_over_at\": \"2024-01-01T10:00:00Z\"\n    }\n  ]\n}"
         }
-      }
+      ]
     },
     {
       "name": "Get download URL",
@@ -51,8 +172,117 @@
           "raw": "{{base_url}}/api/files/{{task_id}}/{{student_id}}/download",
           "host": [ "{{base_url}}" ],
           "path": [ "api", "files", "{{task_id}}", "{{student_id}}", "download" ]
+        },
+        "description": "Generates a presigned URL for downloading a file. The URL is valid for a limited time."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/files/{{task_id}}/{{student_id}}/download",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "files", "{{task_id}}", "{{student_id}}", "download" ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"url\": \"https://minio.example.com/presigned-download-url\"\n}"
         }
-      }
+      ]
+    },
+    {
+      "name": "Generate word cloud",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/files/{{task_id}}/{{student_id}}/wordcloud?format=png",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "files", "{{task_id}}", "{{student_id}}", "wordcloud" ],
+          "query": [
+            {
+              "key": "format",
+              "value": "png",
+              "description": "Image format: png (default) or svg"
+            }
+          ]
+        },
+        "description": "Generates a word cloud visualization of the submitted work. Extracts text from the file, removes stopwords, and creates a visual representation. Returns PNG or SVG image."
+      },
+      "response": [
+        {
+          "name": "Success (PNG)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/files/{{task_id}}/{{student_id}}/wordcloud?format=png",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "files", "{{task_id}}", "{{student_id}}", "wordcloud" ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "png"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "image/png"
+            },
+            {
+              "key": "Content-Disposition",
+              "value": "inline; filename=\"wordcloud_{{task_id}}_{{student_id}}.png\""
+            }
+          ],
+          "body": "[Binary PNG image data]"
+        },
+        {
+          "name": "Success (SVG)",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/files/{{task_id}}/{{student_id}}/wordcloud?format=svg",
+              "host": [ "{{base_url}}" ],
+              "path": [ "api", "files", "{{task_id}}", "{{student_id}}", "wordcloud" ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "svg"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "image/svg+xml"
+            },
+            {
+              "key": "Content-Disposition",
+              "value": "inline; filename=\"wordcloud_{{task_id}}_{{student_id}}.svg\""
+            }
+          ],
+          "body": "[SVG XML data]"
+        }
+      ]
     }
   ],
   "variable": [

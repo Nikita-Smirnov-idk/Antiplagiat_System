@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"time"
 
+	"api_gateway/internal/infrastructure/text_extractor"
+	"api_gateway/internal/infrastructure/wordcloud"
+
 	plagiarismpb "github.com/Nikita-Smirnov-idk/plagiarism-service/contracts/gen/go"
 	storagepb "github.com/Nikita-Smirnov-idk/storage-service/contracts/gen/go"
 	"github.com/go-chi/chi/v5"
@@ -16,17 +19,21 @@ import (
 )
 
 type Server struct {
-	logger         *slog.Logger
-	httpServer     *http.Server
-	storageClient  storagepb.StorageClient
-	analysisClient plagiarismpb.PlagiarismClient
+	logger          *slog.Logger
+	httpServer      *http.Server
+	storageClient   storagepb.StorageClient
+	analysisClient  plagiarismpb.PlagiarismClient
+	wordCloudClient *wordcloud.QuickChartClient
+	textExtractor   *text_extractor.TextExtractor
 }
 
 func NewServer(logger *slog.Logger, port int, storage storagepb.StorageClient, analysis plagiarismpb.PlagiarismClient) *Server {
 	s := &Server{
-		logger:         logger,
-		storageClient:  storage,
-		analysisClient: analysis,
+		logger:          logger,
+		storageClient:   storage,
+		analysisClient:  analysis,
+		wordCloudClient: wordcloud.NewQuickChartClient(),
+		textExtractor:   text_extractor.NewTextExtractor(),
 	}
 
 	r := chi.NewRouter()
@@ -34,6 +41,7 @@ func NewServer(logger *slog.Logger, port int, storage storagepb.StorageClient, a
 	r.Post("/api/files/verify", s.handleVerifyFile)
 	r.Get("/api/files/{task_id}/{student_id}/download", s.handleDownloadURL)
 	r.Post("/api/analysis/{task_id}", s.handleAnalyze)
+	r.Get("/api/files/{task_id}/{student_id}/wordcloud", s.handleWordCloud)
 
 	s.httpServer = &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
@@ -82,8 +90,6 @@ func (s *Server) handleGenerateUploadURL(w http.ResponseWriter, r *http.Request)
 	}
 
 	writeJSON(w, http.StatusOK, map[string]any{
-		"task_id":    req.TaskID,
-		"student_id": req.StudentID,
 		"upload_url": resp.GetUrl(),
 	})
 }
@@ -116,10 +122,7 @@ func (s *Server) handleVerifyFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, map[string]any{
-		"task_id":    req.TaskID,
-		"student_id": req.StudentID,
-		"file_id":    resp.GetFileId(),
-		"exists":     resp.GetFileId() != "",
+		"file_id": resp.GetFileId(),
 	})
 }
 
@@ -189,6 +192,71 @@ func (s *Server) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 		"started_at": resp.GetStartedAt().AsTime(),
 		"reports":    reports,
 	})
+}
+
+func (s *Server) handleWordCloud(w http.ResponseWriter, r *http.Request) {
+	taskID := chi.URLParam(r, "task_id")
+	studentID := chi.URLParam(r, "student_id")
+	if taskID == "" || studentID == "" {
+		writeError(w, http.StatusBadRequest, "task_id and student_id are required")
+		return
+	}
+
+	format := r.URL.Query().Get("format")
+	if format == "" {
+		format = "png"
+	}
+	if format != "png" && format != "svg" {
+		format = "png"
+	}
+
+	ctx := r.Context()
+	downloadResp, err := s.storageClient.GenerateDownloadURL(ctx, &storagepb.GenerateDownloadURLRequest{
+		StudentId:  studentID,
+		TaskId:     taskID,
+		FromInside: true,
+	})
+	if err != nil {
+		writeGrpcError(w, err)
+		return
+	}
+
+	text, err := s.textExtractor.ExtractFromURL(downloadResp.GetUrl())
+	if err != nil {
+		s.logger.Error("failed to extract text from file", "error", err, "task_id", taskID, "student_id", studentID)
+		writeError(w, http.StatusInternalServerError, fmt.Sprintf("failed to extract text from file: %v", err))
+		return
+	}
+
+	if text == "" {
+		writeError(w, http.StatusBadRequest, "file is empty or contains no text")
+		return
+	}
+
+	wordCloudReq := wordcloud.WordCloudRequest{
+		Text:            text,
+		Format:          format,
+		Width:           1000,
+		Height:          1000,
+		FontScale:       15,
+		Scale:           "linear",
+		MaxNumWords:     200,
+		MinWordLength:   3,
+		RemoveStopwords: true,
+		Language:        "ru",
+	}
+
+	imageData, contentType, err := s.wordCloudClient.GenerateWordCloud(wordCloudReq)
+	if err != nil {
+		s.logger.Error("failed to generate word cloud", "error", err)
+		writeError(w, http.StatusInternalServerError, fmt.Sprintf("failed to generate word cloud: %v", err))
+		return
+	}
+
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=\"wordcloud_%s_%s.%s\"", taskID, studentID, format))
+	w.WriteHeader(http.StatusOK)
+	w.Write(imageData)
 }
 
 func writeError(w http.ResponseWriter, code int, msg string) {

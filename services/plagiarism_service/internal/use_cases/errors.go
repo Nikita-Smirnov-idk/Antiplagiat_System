@@ -9,7 +9,6 @@ var (
 	ErrExternalConnectionFailed = errors.New("failed to connect external service")
 	ErrFileExtractionFailed     = errors.New("failed to extract text from file")
 	ErrFileDownloadFailed       = errors.New("failed to download file")
-	ErrFileAnalysisFailed       = errors.New("failed to analyze files")
 )
 
 type AnalysisError struct {
